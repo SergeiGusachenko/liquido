@@ -1,27 +1,20 @@
 package com.company;
 
 import java.util.Arrays;
-import java.util.Scanner;
 
-public class ConnectFour {
+public class BoardLogic {
     private char[][] board;
-    private int width, height;
     private int lastDropColumn = -1;
     private int lastDropRow = -1;
-
-    public ConnectFour(int width, int height) {
+    private int width, height;
+    private ConsoleView view;
+    public BoardLogic(ConsoleView consoleView, int width, int height){
         this.width = width;
         this.height = height;
         board = new char[width][height];
+        view = consoleView;
         for (int i = 0; i < height; i++)
             Arrays.fill(board[i] = new char[width], '.');
-
-    }
-
-    public void printBoard(){
-        for(int i = 0; i < height; i++){
-            System.out.println(board[i]);
-        }
     }
 
     public boolean chechHorizontal(char player){
@@ -79,14 +72,6 @@ public class ConnectFour {
         return false;
     }
 
-    public boolean isWinner() {
-        char player = board[lastDropRow][lastDropColumn];
-        return chechHorizontal(player) ||
-                checkVertical(player) ||
-                checkDiagonal(player) ||
-                checkBackDiagonal(player);
-    }
-
     public void dropTheStone(char player, int colomnNumber) {
         for (int row = height - 1; row >= 0; row--) {
             if (board[row][colomnNumber] == '.') {
@@ -98,28 +83,32 @@ public class ConnectFour {
         }
     }
 
-    public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
+    public int readAndCheckIfCanFitOnTheBoard(char player,int columnNumber){
+        boolean res = false;
+        while(!res){
 
-            int height = 6; int width = 7; // use hardcoded h and w for simplicity
-            int moves = height * width;
-            ConnectFour board = new ConnectFour(width, height);
-            System.out.println("Enter 0-" + (width - 1) + " to choose a column to drop a stone");
-            board.printBoard();
-            char player = 'R';
-            while(moves > 0) {
-                player = (player == 'R') ? 'Y' : 'R';
-                System.out.println("\nPlayer " + player + " please choose the column: ");// TO-DO check for outside of the board values
-                int colomnNumber = input.nextInt();
-                board.dropTheStone(player, colomnNumber);
-                board.printBoard();
-                if (board.isWinner()) {
-                    System.out.println("\nAND THE WINNER IS " + player + " !!!!!!!");
-                    return;
-                }
-                moves--;
+            res = columnNumber >= 0 && columnNumber < width;
+            if(res == true && board[0][columnNumber] == '.')
+                return columnNumber;
+            else{
+                res = true;
+                view.printMessage("\nPlayer " + player + " you cannot put stone in column number: " + columnNumber);
+                view.printMessage("Please choose another one:");
             }
-            System.out.println("GAME OVER");
-         // TO-DO catch block should be here
+        }
+        return -1;
     }
+
+    public void printBoard(){
+        view.printBoard(this.board);
+    }
+
+    public boolean isWinner() {
+        char player = board[lastDropRow][lastDropColumn];
+        return  chechHorizontal(player) ||
+                checkVertical(player) ||
+                checkDiagonal(player) ||
+                checkBackDiagonal(player);
+    }
+
 }
