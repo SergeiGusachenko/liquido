@@ -8,6 +8,8 @@ public class BoardLogic {
     private int lastDropRow = -1;
     private int width, height;
     private ConsoleView view;
+    private final int NUM_OF_STONES_TO_WIN = 4;
+
     public BoardLogic(ConsoleView consoleView, int width, int height){
         this.width = width;
         this.height = height;
@@ -18,58 +20,61 @@ public class BoardLogic {
     }
 
     public boolean chechHorizontal(char player){
-        for(int row = 0; row<board.length; row++){
-            for (int col = 0;col < board[0].length - 3;col++){
-                if (board[row][col] == player   &&
-                        board[row][col+1] == player &&
-                        board[row][col+2] == player &&
-                        board[row][col+3] == player){
-                    return true;
-                }
+        int count = 0;
+        int max = NUM_OF_STONES_TO_WIN - 1;
+
+        for(int i = 1; i <= max; i++){
+            if(lastDropColumn >= max ){
+                if(board[lastDropRow][lastDropColumn - i] == player)
+                    count++;
+            }else if(lastDropColumn < board[0].length - max){
+                if(board[lastDropRow][lastDropColumn + i] == player)
+                    count++;
             }
         }
-        return false;
+        return count == max;
     }
 
     public boolean checkVertical(char player){
-        for(int row = 0; row < board.length - 3; row++){
-            for(int col = 0; col < board[0].length; col++){
-                if (board[row][col] == player   &&
-                        board[row+1][col] == player &&
-                        board[row+2][col] == player &&
-                        board[row+3][col] == player){
-                    return true;
-                }
-            }
+        int count = 0;
+        int max = NUM_OF_STONES_TO_WIN - 1;
+        for(int i = 1; i <= max; i++){
+            if(lastDropRow >= max && board[lastDropRow - i][lastDropColumn] == player)
+                count++;
+            else if(lastDropRow < board.length - max && board[lastDropRow + i][lastDropColumn] == player)
+                count++;
         }
-        return false;
+        return count == max;
     }
 
     public boolean checkDiagonal(char player){
-        for(int row = 3; row < board.length; row++){
-            for(int col = 0; col < board[0].length - 3; col++){
-                if (board[row][col] == player   &&
-                        board[row-1][col+1] == player &&
-                        board[row-2][col+2] == player &&
-                        board[row-3][col+3] == player){
-                    return true;
-                }
-            }
+
+        int count = 0;
+        int max = NUM_OF_STONES_TO_WIN - 1; // we just need n - 1 same stones
+        for(int  i = 1; i <= max ; i++){
+            if(lastDropColumn < board[0].length - max && lastDropRow >= max )
+                if(board[lastDropRow - i][lastDropColumn + i] == player)
+                    count++;
+                else if(lastDropColumn >= max && lastDropRow < board.length - max )
+                    if(board[lastDropRow + i][lastDropColumn - i] == player)
+                        count++;
         }
-        return false;
+        return count == max;
     }
     public boolean checkBackDiagonal(char player){
-        for(int row = 0; row < board.length - 3; row++){
-            for(int col = 0; col < board[0].length - 3; col++){
-                if (board[row][col] == player   &&
-                        board[row+1][col+1] == player &&
-                        board[row+2][col+2] == player &&
-                        board[row+3][col+3] == player){
-                    return true;
-                }
+        int count = 0;
+        int max = NUM_OF_STONES_TO_WIN - 1;
+        for(int i = 1; i <= max ; i++){
+            if(board.length - max > lastDropRow && board[0].length - max > lastDropColumn){
+                if(board[lastDropRow + i][lastDropColumn + i] == player)
+                    count++;
+            }
+            if( lastDropRow >= max && lastDropColumn >= max){
+                if(board[lastDropRow - i][lastDropColumn - i] == player)
+                    count++;
             }
         }
-        return false;
+        return count == max;
     }
 
     public void dropTheStone(char player, int colomnNumber) {
@@ -86,7 +91,6 @@ public class BoardLogic {
     public int readAndCheckIfCanFitOnTheBoard(char player,int columnNumber){
         boolean res = false;
         while(!res){
-
             res = columnNumber >= 0 && columnNumber < width;
             if(res == true && board[0][columnNumber] == '.')
                 return columnNumber;

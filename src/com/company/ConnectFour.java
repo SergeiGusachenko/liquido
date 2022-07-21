@@ -7,7 +7,8 @@ public class ConnectFour {
     private Scanner input = null;
     private ConsoleView console;
     private BoardLogic boardLogic;
-
+    private final int MAX_DIMENSIONS = 1000;
+    private final int MIN_DIMENSIONS = 3;
     public ConnectFour() {
         this.width = -1;
         this.height = -1;
@@ -19,12 +20,12 @@ public class ConnectFour {
     public void initialization(){
         console.printHelp();
         while(width == -1) {
-            console.printMessage("\n Please provide width of the board greater than 3 and less than " + Integer.MAX_VALUE);
+            console.printMessage("\n Please provide width of the board greater than 3 and less than 1000" ); // I believe no one would play this game with field close to 1000
             width = readAndCheckBoardDimension();
         }
 
         while(height == -1) {
-            console.printMessage("\n Please provide height of the board greater than 3 and less than " + Integer.MAX_VALUE);
+            console.printMessage("\n Please provide height of the board greater than 3 and less than 1000" ); // also we want to prevent int overflow
             height = readAndCheckBoardDimension();
         }
         moves = height * width;
@@ -63,7 +64,7 @@ public class ConnectFour {
         int number = -1;
         while(!isCorrect) {
             number = input.nextInt();
-            isCorrect = !(number <= 3 || number >= Integer.MAX_VALUE);
+            isCorrect = !(number <= MIN_DIMENSIONS || number >= MAX_DIMENSIONS);
             if(!isCorrect)
                 console.printMessage("Please provide value greater than 3 ");
         }
